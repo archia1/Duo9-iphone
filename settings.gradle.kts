@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "DuoFold-PoC"
+rootProject.name = "DuoFold-V3"
 include(":app")
