@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable
 import android.os.IBinder
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import android.widget.*
 
@@ -42,13 +43,14 @@ class DuoOverlayService : Service() {
     private fun dp(v: Int): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v.toFloat(), resources.displayMetrics).toInt()
 
     private fun createDuoView(): LinearLayout {
-        val outer = LinearLayout(this).apply {
+        val ctx = this
+        val outer = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             setBackgroundColor(Color.argb(200, 0, 0, 0))
         }
 
-        val label = TextView(this).apply {
+        val label = TextView(ctx).apply {
             text = "Fold 8 Wide - iPhone Duo Mode"
             setTextColor(Color.WHITE)
             textSize = 14f
@@ -57,24 +59,25 @@ class DuoOverlayService : Service() {
         }
         outer.addView(label)
 
-        val duoRow = LinearLayout(this).apply {
+        val duoRow = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             setPadding(dp(12), dp(8), dp(12), dp(16))
         }
 
         duoRow.addView(createIPhone("Left iPhone", arrayOf("📞","💬","📷","🎵","📸","🗒️","⚙️","🗺️")))
-        val hinge = View(this).apply {
-            layoutParams = LinearLayout.LayoutParams(dp(8), dp(380)).apply { setMargins(dp(4),0,dp(4),0) }
-            setBackgroundColor(Color.DKGRAY)
-        }
+
+        val hinge = View(ctx)
+        hinge.layoutParams = LinearLayout.LayoutParams(dp(8), dp(380)).apply { setMargins(dp(4),0,dp(4),0) }
+        hinge.setBackgroundColor(Color.DKGRAY)
         duoRow.addView(hinge)
+
         duoRow.addView(createIPhone("Right iPhone", arrayOf("📧","🌐","🎬","📚","💡","🛒","🏠","🎮")))
 
         outer.addView(duoRow)
 
-        val hint = TextView(this).apply {
-            text = "Tap launcher icon to close overlay"
+        val hint = TextView(ctx).apply {
+            text = "Tap background to close overlay"
             setTextColor(Color.LTGRAY)
             textSize = 11f
             gravity = Gravity.CENTER
@@ -88,7 +91,8 @@ class DuoOverlayService : Service() {
     }
 
     private fun createIPhone(label: String, icons: Array<String>): FrameLayout {
-        val frame = FrameLayout(this).apply {
+        val ctx = this
+        val frame = FrameLayout(ctx).apply {
             layoutParams = LinearLayout.LayoutParams(dp(168), dp(360))
         }
         val bg = GradientDrawable().apply {
@@ -99,15 +103,14 @@ class DuoOverlayService : Service() {
         }
         frame.background = bg
 
-        val inner = LinearLayout(this).apply {
+        val inner = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
             layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
             setPadding(dp(8), dp(6), dp(8), dp(8))
         }
 
-        // Notch
-        val notch = TextView(this).apply {
+        val notch = TextView(ctx).apply {
             val notchBg = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = dp(12).toFloat()
@@ -118,7 +121,7 @@ class DuoOverlayService : Service() {
         }
         inner.addView(notch)
 
-        val title = TextView(this).apply {
+        val title = TextView(ctx).apply {
             text = label
             textSize = 10f
             setTextColor(Color.DKGRAY)
@@ -127,14 +130,13 @@ class DuoOverlayService : Service() {
         }
         inner.addView(title)
 
-        // Icon grid
-        val grid = GridLayout(this).apply {
+        val grid = GridLayout(ctx).apply {
             columnCount = 4
             rowCount = 3
             alignmentMode = GridLayout.ALIGN_BOUNDS
         }
         icons.forEach { emoji ->
-            val tv = TextView(this).apply {
+            val tv = TextView(ctx).apply {
                 text = emoji
                 textSize = 22f
                 gravity = Gravity.CENTER
@@ -153,17 +155,15 @@ class DuoOverlayService : Service() {
         }
         inner.addView(grid)
 
-        // Home indicator
-        val home = View(this).apply {
-            layoutParams = LinearLayout.LayoutParams(dp(60), dp(4)).apply {
-                gravity = Gravity.CENTER_HORIZONTAL
-                topMargin = dp(12)
-            }
-            background = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = dp(2).toFloat()
-                setColor(Color.BLACK)
-            }
+        val home = View(ctx)
+        home.layoutParams = LinearLayout.LayoutParams(dp(60), dp(4)).apply {
+            gravity = Gravity.CENTER_HORIZONTAL
+            topMargin = dp(12)
+        }
+        home.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(2).toFloat()
+            setColor(Color.BLACK)
         }
         inner.addView(home)
 
